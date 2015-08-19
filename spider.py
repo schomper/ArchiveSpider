@@ -129,7 +129,7 @@ def write_article(url, f_ptr):
         para = para.getText()
         cached_stop_words = stopwords.words("english")
         para = ' '.join([word for word in para.split() if word not in cached_stop_words])
-        f_ptr.write(para)
+        f_ptr.write(para + ' ')
 
     f_ptr.write('\n</TEXT>\n')
     f_ptr.write('</DOC>\n')
