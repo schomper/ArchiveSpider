@@ -89,24 +89,26 @@ def process_day(day, year_name):
             link = 'http://www.abc.net.au' + link["href"]
             if not '/topic/' in link:
                 article_list.append(link)
+
     
-   
+    f_ptr = open(file_name, 'w')
+
     for article in article_list:
-        write_article(article, file_name)
+        write_article(article, f_ptr)
 
 
-def write_article(url, file_name):
+def write_article(url, f_ptr):
     """ Write the information about the article to a file.
 
     Keyword arguments:
     url -- url of the article to write to file
     file_name -- name of the file to which to write
     """
-    f_ptr = open(file_name, 'w')
 
     try: 
         f = urllib.request.urlopen(url)
     except:
+        print('Skipping')
         return
 
     soup = BeautifulSoup(f.read())
@@ -122,14 +124,14 @@ def write_article(url, file_name):
     f_ptr.write('<DOC>\n')
     f_ptr.write('<DOC_NAME>' + title + '</DOC_NAME>\n')
     
-    f_ptr.write('<TEXT>')
+    f_ptr.write('<TEXT>\n')
     for para in body:
         para = para.getText()
         cached_stop_words = stopwords.words("english")
         para = ' '.join([word for word in para.split() if word not in cached_stop_words])
         f_ptr.write(para)
 
-    f_ptr.write('</TEXT>\n')
+    f_ptr.write('\n</TEXT>\n')
     f_ptr.write('</DOC>\n')
 
 if __name__ == "__main__":
