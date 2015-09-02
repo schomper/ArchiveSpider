@@ -1,9 +1,12 @@
 #! /usr/bin/python3
 
 from bs4 import BeautifulSoup
+import re
 import urllib.request
 from nltk.corpus import stopwords
+import string
 import os
+import random
 
 def get_year_links(url):
     """ Get the links of all the year tabs.
@@ -93,7 +96,9 @@ def process_day(day, year_name):
     
     f_ptr = open(file_name, 'w')
 
-    for article in article_list:
+    for i in range(0, 10):
+        article = random.choice(article_list)
+        article_list.remove(article)
         write_article(article, f_ptr)
 
 
@@ -121,17 +126,36 @@ def write_article(url, f_ptr):
 
     body = section.findAll('p')
     print('\t\t' + title)
-    f_ptr.write('<DOC>\n')
-    f_ptr.write('<DOC_NAME>' + title + '</DOC_NAME>\n')
-    
-    f_ptr.write('<TEXT>\n')
+
+    para_list = []
     for para in body:
         para = para.getText()
+        
+        # Remove stop words
         cached_stop_words = stopwords.words("english")
         para = ' '.join([word for word in para.split() if word not in cached_stop_words])
+    
+        # Remove dashes safely
+        para = para.replace ("-", " ")
+
+        # Remove punctuation
+        punct = re.compile(r'([^A-Za-z0-9 ])')
+        para = punct.sub("", para)
+
+        para_list.append(para)
+
+    f_ptr.write('<DOC>\n')
+    f_ptr.write('<DOC_NAME>' + title + '</DOC_NAME>\n')
+    f_ptr.write('<TEXT>\n')
+
+    # Remove posted on date
+    para_list.pop(0)
+
+    for para in para_list:
         f_ptr.write(para + ' ')
 
     f_ptr.write('\n</TEXT>\n')
+    
     f_ptr.write('</DOC>\n')
 
 if __name__ == "__main__":
