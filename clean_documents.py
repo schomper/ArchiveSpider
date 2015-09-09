@@ -4,11 +4,14 @@ from nltk.corpus import stopwords
 
 
 def get_documents(year, filename):
+
     documents_list = []
     global undef_count
 
     read_file = open('output2/' + str(year) + '/' + filename, 'r')
     line = read_file.readline()
+    
+    day, month = filename.split('.')[0].split('_')
 
     while line != '':
         if(line == '<DOC>\n'):
@@ -17,9 +20,7 @@ def get_documents(year, filename):
             #################################
             # Add date to document
             #################################
-            date = filename[:-4]
-            dates = date.split('_')
-            document.append(dates[0] + ' ' + dates[1] + ' ' + str(year))
+            document.append(day + ' ' + month + ' ' + str(year))
             
             #################################
             # Add title to document
@@ -111,7 +112,12 @@ def clean_line(line):
     clean_line = ''.join([index for index in line if not index.isdigit()])
     
     # remove stop words
-    clean_line = ' '.join([word for word in clean_line if word not in stopwords.words('english')])
+    words_list = clean_line.split(' ')
+    for word in words_list:
+        if word in stopwords.words('english'):
+            words_list.remove(word)
+    
+    clean_line = ' '.join(words_list)
 
     # make words lowercase
     clean_line = clean_line.lower()
@@ -133,6 +139,13 @@ def main():
 
             document_list = get_documents(year, filename)
             doc_count += len(document_list)
+    
+            # reformat date in file name correctly
+            filedate, filename_suffix = filename.rsplit('.')
+            filename_suffix = '.' + filename_suffix
+
+            day, month = filedate.split('_')
+            filename = month + '_' + day + filename_suffix
 
             new_file = open('clean_docs/' + str(year) + '/' + filename, 'w')
 
