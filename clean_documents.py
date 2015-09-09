@@ -97,9 +97,10 @@ def clean_topics(topic):
     # pick only the first topic
     clean_topic = clean_topic.split(' ')[0]
 
-    if topic not in topics:
-        topics.append(topic)
+    if clean_topic not in topics:
+        topics.append(clean_topic)
 
+    return clean_topic
 
 def clean_line(line):
     # remove source information
@@ -110,7 +111,7 @@ def clean_line(line):
     clean_line = ''.join([index for index in line if not index.isdigit()])
     
     # remove stop words
-    clean_line = [word for word in clean_line if word not in stopwords.words('english')] 
+    clean_line = ' '.join([word for word in clean_line if word not in stopwords.words('english')])
 
     # make words lowercase
     clean_line = clean_line.lower()
